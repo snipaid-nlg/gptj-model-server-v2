@@ -1,6 +1,6 @@
 from potassium import Potassium, Request, Response
 
-from transformers import GPTJConfig, AutoTokenizer, models
+from transformers import GPTJConfig, AutoTokenizer, models, pipeline
 from utils import GPTJBlock, GPTJForCausalLM, add_adapters
 import torch
 
@@ -48,12 +48,31 @@ def init():
 # @app.handler runs for every call
 @app.handler()
 def handler(context: dict, request: Request) -> Response:
-    prompt = request.json.get("prompt")
+    # get model and tokeinzer from context
     model = context.get("model")
-    outputs = model(prompt)
+    tokenizer = context.get("tokenizer")
+
+    # parse out arguments from request
+    prompt = request.json.get("prompt")
+
+    # handle missing prompt
+    if prompt == None:
+        return Response(
+            json = {"message": "No prompt provided"}, 
+            status=500
+        )
+
+    # Initialize pipeline
+    gen_pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0, **request)
+
+    # Run generation pipline
+    output = gen_pipe(prompt)
+
+    # Get output text
+    output_text = output[0]['generated_text']
 
     return Response(
-        json = {"outputs": outputs[0]}, 
+        json = {"output": output_text}, 
         status=200
     )
 
