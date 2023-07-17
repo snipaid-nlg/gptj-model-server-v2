@@ -13,6 +13,9 @@ RUN pip3 install --upgrade pip
 ADD requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
+# Fix bitsandbytes to compile with gpu support
+RUN cp /opt/conda/lib/python3.8/site-packages/bitsandbytes/libbitsandbytes_cuda113.so /opt/conda/lib/python3.8/site-packages/bitsandbytes/libbitsandbytes_cpu.so
+
 # Add your model weight files 
 # (in this case we have a python script)
 ADD download.py .
