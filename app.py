@@ -53,7 +53,8 @@ def handler(context: dict, request: Request) -> Response:
     tokenizer = context.get("tokenizer")
 
     # parse out arguments from request
-    prompt = request.json.get("prompt")
+    model_inputs = request.json
+    prompt = model_inputs.pop("prompt")
 
     # handle missing prompt
     if prompt == None:
@@ -63,7 +64,7 @@ def handler(context: dict, request: Request) -> Response:
         )
 
     # Initialize pipeline
-    gen_pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0, **request)
+    gen_pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0, **model_inputs)
 
     # Run generation pipline
     output = gen_pipe(prompt)
