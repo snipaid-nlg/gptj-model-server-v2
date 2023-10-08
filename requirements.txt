@@ -1,4 +1,4 @@
-potassium==0.0.10
+potassium==0.1.0
 transformers==4.26.1
 bitsandbytes==0.35.4
 accelerate==0.15.0
